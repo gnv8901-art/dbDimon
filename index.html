@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Command Center 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:rgba(0,0,0,0)}
+:root{
+  --bg:#060d1a;--card:#0e1929;--card2:#152035;--border:#1a2d45;
+  --green:#00e5b0;--green2:#00ff88;--red:#ff3d5a;--yellow:#ffd600;
+  --blue:#3d8eff;--purple:#9d78ff;--orange:#ff7c3d;--pink:#ff5fa0;
+  --text:#e8f0fc;--text2:#7a9cc0;--text3:#344d6b;
+}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden;
+  padding-bottom:70px;
+}
+
+/* HEADER */
+.hdr{
+  background:linear-gradient(135deg,#080f1e,#0e1540,#080f1e);
+  border-bottom:1px solid var(--border);
+  padding:12px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:-webkit-sticky;position:sticky;top:0;z-index:100;
+  -webkit-transform:translateZ(0);transform:translateZ(0);
+}
+.hdr-l{display:flex;align-items:center;gap:10px}
+.logo{
+  width:38px;height:38px;
+  background:linear-gradient(135deg,var(--green),var(--blue));
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.hdr-title{font-size:15px;font-weight:800;background:linear-gradient(90deg,#fff,var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr-sub{font-size:10px;color:var(--text2)}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.live{display:flex;align-items:center;gap:5px;background:rgba(0,229,176,0.1);border:1px solid rgba(0,229,176,0.25);border-radius:20px;padding:4px 10px;font-size:10px;color:var(--green);font-weight:600}
+.dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.clk{font-size:10px;color:var(--text3)}
+
+/* TABS */
+.tabs{
+  display:flex;overflow-x:auto;
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  position:-webkit-sticky;position:sticky;
+  top:62px;z-index:99;
+  -webkit-transform:translateZ(0);transform:translateZ(0);
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex-shrink:0;padding:13px 18px;
+  font-size:12px;font-weight:600;color:var(--text2);
+  cursor:pointer;border-bottom:2px solid transparent;
+  transition:color 0.2s,border-color 0.2s;
+  white-space:nowrap;-webkit-user-select:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.tab.on{color:var(--green);border-bottom-color:var(--green)}
+
+/* PAGES */
+.page{display:none;padding:14px 14px 0}
+.page.on{display:block}
+
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+@media(min-width:640px){.kpi-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.kpi-grid{grid-template-columns:repeat(5,1fr)}}
+
+.kpi{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:14px;position:relative;overflow:hidden;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  -webkit-transform:translateZ(0);transform:translateZ(0);
+}
+.kpi:active{opacity:0.85;transform:scale(0.97)}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:14px 14px 0 0}
+.kpi.cg::after{background:linear-gradient(90deg,var(--green),transparent)}
+.kpi.cb::after{background:linear-gradient(90deg,var(--blue),transparent)}
+.kpi.cp::after{background:linear-gradient(90deg,var(--purple),transparent)}
+.kpi.cy::after{background:linear-gradient(90deg,var(--yellow),transparent)}
+.kpi.cr::after{background:linear-gradient(90deg,var(--red),transparent)}
+.kpi-ico{font-size:22px;margin-bottom:8px}
+.kpi-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;font-weight:600}
+.kpi-val{font-size:17px;font-weight:900;letter-spacing:-0.5px;line-height:1}
+.kpi.cg .kpi-val{color:var(--green)}
+.kpi.cb .kpi-val{color:var(--blue)}
+.kpi.cp .kpi-val{color:var(--purple)}
+.kpi.cy .kpi-val{color:var(--yellow)}
+.kpi.cr .kpi-val{color:var(--red)}
+.kpi-trend{font-size:10px;margin-top:6px;color:var(--text3)}
+.up{color:var(--green2)}
+.dn{color:var(--red)}
+@media(min-width:400px){.kpi-val{font-size:19px}}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
+.card-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:8px}
+.card-title{font-size:13px;font-weight:700;margin-bottom:3px}
+.card-sub{font-size:10px;color:var(--text3)}
+.badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.bg{background:rgba(0,229,176,0.1);color:var(--green);border:1px solid rgba(0,229,176,0.2)}
+.bb{background:rgba(61,142,255,0.1);color:var(--blue);border:1px solid rgba(61,142,255,0.2)}
+.by{background:rgba(255,214,0,0.1);color:var(--yellow);border:1px solid rgba(255,214,0,0.2)}
+.br{background:rgba(255,61,90,0.1);color:var(--red);border:1px solid rgba(255,61,90,0.2)}
+.bp{background:rgba(157,120,255,0.1);color:var(--purple);border:1px solid rgba(157,120,255,0.2)}
+.bo{background:rgba(255,124,61,0.1);color:var(--orange);border:1px solid rgba(255,124,61,0.2)}
+
+/* CHART CONTAINER — ключевой фикс для iOS */
+.ch{position:relative;width:100%;overflow:hidden}
+.ch canvas{display:block;width:100%!important}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:640px){.g2{grid-template-columns:1fr 1fr}}
+.g3{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:800px){.g3{grid-template-columns:1fr 1fr 1fr}}
+
+/* PILLS */
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.pill{
+  padding:8px 14px;border-radius:8px;
+  border:1px solid var(--border);background:var(--card2);
+  color:var(--text2);font-size:11px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;
+  -webkit-user-select:none;user-select:none;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  min-height:36px;display:inline-flex;align-items:center;
+}
+.pill.on,.pill:active{border-color:var(--green);color:var(--green);background:rgba(0,229,176,0.08)}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:460px}
+th{padding:8px 10px;color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);font-weight:600;text-align:left;white-space:nowrap}
+td{padding:10px;border-bottom:1px solid rgba(26,45,69,0.5);color:var(--text2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+
+/* STATUS BADGES */
+.sb{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:5px;font-size:10px;font-weight:700;white-space:nowrap}
+.sdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.sr{background:rgba(255,61,90,0.12);color:var(--red);border:1px solid rgba(255,61,90,0.2)}
+.sy{background:rgba(255,214,0,0.1);color:var(--yellow);border:1px solid rgba(255,214,0,0.15)}
+.so{background:rgba(255,124,61,0.1);color:var(--orange);border:1px solid rgba(255,124,61,0.15)}
+.sg{background:rgba(0,229,176,0.1);color:var(--green);border:1px solid rgba(0,229,176,0.15)}
+
+/* ACTION BUTTONS */
+.abtn{
+  padding:6px 11px;border-radius:6px;
+  font-size:10px;font-weight:700;cursor:pointer;
+  border:1px solid;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-appearance:none;
+  display:inline-block;
+}
+.abtn:active{opacity:0.7}
+.abtn-r{background:rgba(255,61,90,0.15);border-color:rgba(255,61,90,0.3);color:var(--red)}
+.abtn-y{background:rgba(255,214,0,0.1);border-color:rgba(255,214,0,0.2);color:var(--yellow)}
+.abtn-o{background:rgba(255,124,61,0.1);border-color:rgba(255,124,61,0.2);color:var(--orange)}
+
+/* STORE CARDS */
+.sc{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px}
+.sc-name{font-size:12px;font-weight:700;margin-bottom:12px}
+.sc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.sc-lbl{font-size:10px;color:var(--text3)}
+.sc-val{font-size:12px;font-weight:700}
+.bar-bg{height:4px;background:var(--border);border-radius:2px;margin-top:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px}
+
+/* PROGRESS */
+.pr-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pr-lbl{font-size:11px;color:var(--text2);width:80px;flex-shrink:0}
+.pr-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.pr-fill{height:100%;border-radius:3px}
+.pr-val{font-size:11px;font-weight:700;min-width:55px;text-align:right}
+
+/* FORECAST GRID */
+.fc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+@media(min-width:600px){.fc-grid{grid-template-columns:repeat(4,1fr)}}
+.fc-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.fc-lbl{font-size:9px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.fc-val{font-size:17px;font-weight:900;margin-bottom:4px}
+.fc-note{font-size:10px;color:var(--text2)}
+
+/* AI INSIGHTS */
+.ins{background:linear-gradient(135deg,rgba(61,142,255,0.06),rgba(157,120,255,0.06));border:1px solid rgba(61,142,255,0.15);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+.ins-ico{font-size:22px;flex-shrink:0}
+.ins-title{font-size:12px;font-weight:700;margin-bottom:4px}
+.ins-text{font-size:11px;color:var(--text2);line-height:1.6}
+
+/* SECTION TITLE */
+.stitle{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;margin-top:4px}
+
+/* DIVIDER */
+.div{height:1px;background:var(--border);margin:12px 0}
+
+/* BOTTOM NAV */
+.bnav{
+  display:flex;position:fixed;bottom:0;left:0;right:0;
+  background:var(--card);border-top:1px solid var(--border);
+  z-index:200;
+  -webkit-transform:translateZ(0);transform:translateZ(0);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.bn{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:8px 4px;cursor:pointer;gap:3px;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none;user-select:none;
+}
+.bn:active{background:rgba(255,255,255,0.05)}
+.bn-ico{font-size:20px;line-height:1}
+.bn-lbl{font-size:9px;color:var(--text3);font-weight:600;transition:color 0.2s}
+.bn.on .bn-lbl{color:var(--green)}
+.bn.on .bn-ico{filter:drop-shadow(0 0 4px var(--green))}
+
+/* MODAL */
+.overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.75);z-index:500;
+  -webkit-transform:translateZ(0);transform:translateZ(0);
+  touch-action:none;
+}
+.overlay.on{display:flex;align-items:flex-end;justify-content:center}
+.mbox{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px 20px 0 0;padding:24px 20px;
+  width:100%;max-width:520px;
+  animation:sup 0.28s ease;
+  max-height:80vh;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+@keyframes sup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.m-title{font-size:16px;font-weight:800;margin-bottom:8px}
+.m-body{font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:6px}
+.m-close{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,var(--green),var(--blue));
+  border:none;border-radius:10px;color:#000;
+  font-size:14px;font-weight:800;cursor:pointer;
+  margin-top:16px;touch-action:manipulation;
+  -webkit-appearance:none;
+}
+
+/* SIM RESULT */
+.sim-grid{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sim-lbl{font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;font-weight:600}
+.sim-val{font-size:18px;font-weight:900}
+
+/* LEGEND */
+.leg{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;justify-content:center}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.leg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+
+/* ANIMATION */
+.card,.kpi{animation:fup 0.3s ease both}
+@keyframes fup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-l">
+    <div class="logo">💼</div>
+    <div>
+      <div class="hdr-title">COMMAND CENTER</div>
+      <div class="hdr-sub">3 точки · Москва · 2026</div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <div class="live"><div class="dot"></div>LIVE</div>
+    <div class="clk" id="clk"></div>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab on" id="t0" onclick="goTab(0)">📊 Обзор</div>
+  <div class="tab" id="t1" onclick="goTab(1)">🔑 Залоги</div>
+  <div class="tab" id="t2" onclick="goTab(2)">💸 Продажи</div>
+  <div class="tab" id="t3" onclick="goTab(3)">📈 Аналитика</div>
+  <div class="tab" id="t4" onclick="goTab(4)">🔮 Прогноз</div>
+</div>
+
+<!-- ======= PAGE 0: OVERVIEW ======= -->
+<div class="page on" id="p0">
+
+  <div style="height:14px"></div>
+
+  <div class="pills">
+    <span class="pill" onclick="pillSel(this,'.pills')">Янв 2026</span>
+    <span class="pill" onclick="pillSel(this,'.pills')">3 мес</span>
+    <span class="pill on" onclick="pillSel(this,'.pills')">Весь 2026</span>
+    <span class="pill" onclick="pillSel(this,'.pills')">Q1</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi cg" onclick="showModal('portfolio')">
+      <div class="kpi-ico">💰</div>
+      <div class="kpi-lbl">Залог. портфель</div>
+      <div class="kpi-val">3 842 500 ₽</div>
+      <div class="kpi-trend"><span class="up">↑ +22%</span> vs 2025</div>
+    </div>
+    <div class="kpi cb" onclick="showModal('revenue')">
+      <div class="kpi-ico">📈</div>
+      <div class="kpi-lbl">Выручка 5 мес</div>
+      <div class="kpi-val">4 218 600 ₽</div>
+      <div class="kpi-trend"><span class="up">↑ +17%</span> план 105%</div>
+    </div>
+    <div class="kpi cp" onclick="showModal('profit')">
+      <div class="kpi-ico">💎</div>
+      <div class="kpi-lbl">Чист. прибыль</div>
+      <div class="kpi-val">1 364 200 ₽</div>
+      <div class="kpi-trend"><span class="up">↑ +15%</span> маржа 32%</div>
+    </div>
+    <div class="kpi cy" onclick="showModal('stock')">
+      <div class="kpi-ico">📦</div>
+      <div class="kpi-lbl">Товаров склад</div>
+      <div class="kpi-val">18 шт</div>
+      <div class="kpi-trend">оценка <span style="color:var(--yellow);font-weight:700">5 680к ₽</span></div>
+    </div>
+    <div class="kpi cr" onclick="showModal('alerts')">
+      <div class="kpi-ico">🔥</div>
+      <div class="kpi-lbl">Горящих залогов</div>
+      <div class="kpi-val">5 шт</div>
+      <div class="kpi-trend"><span class="dn">Требуют внимания!</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <div><div class="card-title">📊 P&L по месяцам 2026</div><div class="card-sub">Доходы · Расходы · Прибыль</div></div>
+      <span class="badge bg">+15% к плану</span>
+    </div>
+    <div class="ch" style="height:240px"><canvas id="c_pnl"></canvas></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-hdr">
+        <div><div class="card-title">🍩 Статусы залогов</div><div class="card-sub">2026 · все точки</div></div>
+        <span class="badge bb">168 шт</span>
+      </div>
+      <div class="ch" style="height:190px"><canvas id="c_donut"></canvas></div>
+      <div class="leg">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Выкуп 41%</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--blue)"></div>Продано 48%</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--purple)"></div>Активные 11%</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div><div class="card-title">🏪 Рейтинг точек</div><div class="card-sub">Чистая прибыль + кэш</div></div></div>
+      <div class="pr-row"><div class="pr-lbl">🥇 Центр</div><div class="pr-bar"><div class="pr-fill" style="width:100%;background:var(--green)"></div></div><div class="pr-val" style="color:var(--green)">584к ₽</div></div>
+      <div class="pr-row"><div class="pr-lbl">🥈 Север</div><div class="pr-bar"><div class="pr-fill" style="width:78%;background:var(--blue)"></div></div><div class="pr-val" style="color:var(--blue)">456к ₽</div></div>
+      <div class="pr-row"><div class="pr-lbl">🥉 Запад</div><div class="pr-bar"><div class="pr-fill" style="width:55%;background:var(--purple)"></div></div><div class="pr-val" style="color:var(--purple)">324к ₽</div></div>
+      <div class="div"></div>
+      <div class="card-title" style="font-size:12px;margin-bottom:10px">💰 Кэш по точкам</div>
+      <div class="pr-row"><div class="pr-lbl">Центр</div><div class="pr-bar"><div class="pr-fill" style="width:100%;background:var(--yellow)"></div></div><div class="pr-val" style="color:var(--yellow)">1 240к</div></div>
+      <div class="pr-row"><div class="pr-lbl">Север</div><div class="pr-bar"><div class="pr-fill" style="width:73%;background:var(--yellow)"></div></div><div class="pr-val" style="color:var(--yellow)">910к</div></div>
+      <div class="pr-row"><div class="pr-lbl">Запад</div><div class="pr-bar"><div class="pr-fill" style="width:53%;background:var(--yellow)"></div></div><div class="pr-val" style="color:var(--yellow)">660к</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <div><div class="card-title">📈 Динамика операций 2026</div><div class="card-sub">Залоги · Продажи · Выкуп</div></div>
+      <span class="badge by">Пик: Май</span>
+    </div>
+    <div class="ch" style="height:220px"><canvas id="c_dyn"></canvas></div>
+  </div>
+
+</div>
+
+<!-- ======= PAGE 1: PLEDGES ======= -->
+<div class="page" id="p1">
+  <div style="height:14px"></div>
+
+  <div class="stitle">Фильтр по точке</div>
+  <div class="pills" id="sPills">
+    <span class="pill on" onclick="pillSel(this,'#sPills')">Все точки</span>
+    <span class="pill" onclick="pillSel(this,'#sPills')">🏪 Центр</span>
+    <span class="pill" onclick="pillSel(this,'#sPills')">🏪 Север</span>
+    <span class="pill" onclick="pillSel(this,'#sPills')">🏪 Запад</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi cg"><div class="kpi-ico">📋</div><div class="kpi-lbl">Всего залогов</div><div class="kpi-val">168</div><div class="kpi-trend"><span class="up">↑ +28шт</span> vs 2025</div></div>
+    <div class="kpi cb"><div class="kpi-ico">💵</div><div class="kpi-lbl">Выдано всего</div><div class="kpi-val">28.4М ₽</div><div class="kpi-trend">ср. займ 169к</div></div>
+    <div class="kpi cp"><div class="kpi-ico">🔄</div><div class="kpi-lbl">% выкупа</div><div class="kpi-val">41%</div><div class="kpi-trend"><span class="up">↑ +3%</span> vs 2025</div></div>
+    <div class="kpi cr"><div class="kpi-ico">⏰</div><div class="kpi-lbl">Просрочено</div><div class="kpi-val">5 шт</div><div class="kpi-trend"><span class="dn">срочно!</span></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <div><div class="card-title">🔥 Горящие залоги</div><div class="card-sub">Требуют действия прямо сейчас</div></div>
+      <span class="badge br">5 позиций</span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Статус</th><th>Товар</th><th>Точка</th><th>Займ</th><th>Срок</th><th>Действие</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="sb sr"><span class="sdot" style="background:var(--red)"></span>Просрочен</span></td>
+            <td style="color:var(--text);font-weight:600">Rolex Datejust 41мм</td><td>Запад</td>
+            <td style="color:var(--yellow);font-weight:700">340 000 ₽</td>
+            <td style="color:var(--red)">-8 дн.</td>
+            <td><button class="abtn abtn-r" onclick="showModal('action')">Выставить</button></td>
+          </tr>
+          <tr>
+            <td><span class="sb sr"><span class="sdot" style="background:var(--red)"></span>Просрочен</span></td>
+            <td style="color:var(--text);font-weight:600">AP Royal Oak 37мм</td><td>Центр</td>
+            <td style="color:var(--yellow);font-weight:700">720 000 ₽</td>
+            <td style="color:var(--red)">-3 дн.</td>
+            <td><button class="abtn abtn-r" onclick="showModal('action')">Выставить</button></td>
+          </tr>
+          <tr>
+            <td><span class="sb sy"><span class="sdot" style="background:var(--yellow)"></span>Завтра</span></td>
+            <td style="color:var(--text);font-weight:600">iPhone 17 Pro Max 1TB</td><td>Север</td>
+            <td style="color:var(--yellow);font-weight:700">128 000 ₽</td>
+            <td style="color:var(--yellow)">+1 дн.</td>
+            <td><button class="abtn abtn-y" onclick="showModal('call')">Позвонить</button></td>
+          </tr>
+          <tr>
+            <td><span class="sb so"><span class="sdot" style="background:var(--orange)"></span>3 дня</span></td>
+            <td style="color:var(--text);font-weight:600">MacBook Pro M4 Max</td><td>Центр</td>
+            <td style="color:var(--yellow);font-weight:700">158 000 ₽</td>
+            <td style="color:var(--orange)">+3 дн.</td>
+            <td><button class="abtn abtn-o" onclick="showModal('call')">Позвонить</button></td>
+          </tr>
+          <tr>
+            <td><span class="sb so"><span class="sdot" style="background:var(--orange)"></span>5 дней</span></td>
+            <td style="color:var(--text);font-weight:600">Canon EOS R1 Body</td><td>Запад</td>
+            <td style="color:var(--yellow);font-weight:700">198 000 ₽</td>
+            <td style="color:var(--orange)">+5 дн.</td>
+            <td><button class="abtn abtn-o" onclick="showModal('call')">Позвонить</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><div><div class="card-title">📅 Залоги по месяцам</div><div class="card-sub">Кол-во и объём выданных займов</div></div></div>
+    <div class="ch" style="height:220px"><canvas id="c_pmon"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><div><div class="card-title">📂 По категориям</div><div class="card-sub">Что чаще берут в залог</div></div></div>
+    <div class="ch" style="height:250px"><canvas id="c_pcat"></canvas></div>
+  </div>
+</div>
+
+<!-- ======= PAGE 2: SALES ======= -->
+<div class="page" id="p2">
+  <div style="height:14px"></div>
+
+  <div class="kpi-grid">
+    <div class="kpi cb"><div class="kpi-ico">🛍️</div><div class="kpi-lbl">Продано товаров</div><div class="kpi-val">81 шт</div><div class="kpi-trend"><span class="up">↑ +12шт</span> vs 2025</div></div>
+    <div class="kpi cg"><div class="kpi-ico">💰</div><div class="kpi-lbl">Выручка продаж</div><div class="kpi-val">8 940к ₽</div><div class="kpi-trend"><span class="up">↑ +18%</span></div></div>
+    <div class="kpi cp"><div class="kpi-ico">📊</div><div class="kpi-lbl">Прибыль продаж</div><div class="kpi-val">2 682к ₽</div><div class="kpi-trend">маржа 30%</div></div>
+    <div class="kpi cy"><div class="kpi-ico">⚡</div><div class="kpi-lbl">Ср. продажа</div><div class="kpi-val">110 400 ₽</div><div class="kpi-trend"><span class="up">↑ +8%</span></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <div><div class="card-title">💸 Продажи по месяцам 2026</div><div class="card-sub">Выручка и прибыль</div></div>
+      <span class="badge bg">Пик: Май</span>
+    </div>
+    <div class="ch" style="height:230px"><canvas id="c_sales"></canvas></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-hdr"><div><div class="card-title">🏆 ТОП категорий</div><div class="card-sub">По выручке от продаж</div></div></div>
+      <div class="ch" style="height:210px"><canvas id="c_catsal"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div><div class="card-title">⏱️ Скорость продажи</div><div class="card-sub">Среднее дней до продажи</div></div></div>
+      <div class="ch" style="height:210px"><canvas id="c_speed"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <div><div class="card-title">🧾 Последние продажи</div><div class="card-sub">2026 год</div></div>
+      <span class="badge bb">81 сделка</span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Дата</th><th>Товар</th><th>Точка</th><th>Себест.</th><th>Продано</th><th>Прибыль</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--text3)">14 мая</td><td style="color:var(--text);font-weight:600">iPhone 17 Pro 512GB</td><td>Центр</td><td>89 000 ₽</td><td style="color:var(--green);font-weight:700">138 000 ₽</td><td style="color:var(--green2);font-weight:700">+49 000 ₽</td></tr>
+          <tr><td style="color:var(--text3)">12 мая</td><td style="color:var(--text);font-weight:600">Breitling Navitimer 46мм</td><td>Запад</td><td>145 000 ₽</td><td style="color:var(--green);font-weight:700">218 000 ₽</td><td style="color:var(--green2);font-weight:700">+73 000 ₽</td></tr>
+          <tr><td style="color:var(--text3)">10 мая</td><td style="color:var(--text);font-weight:600">MacBook Air M3 15"</td><td>Север</td><td>62 000 ₽</td><td style="color:var(--green);font-weight:700">94 000 ₽</td><td style="color:var(--green2);font-weight:700">+32 000 ₽</td></tr>
+          <tr><td style="color:var(--text3)">08 мая</td><td style="color:var(--text);font-weight:600">Серьги брилл. 0.8кт</td><td>Центр</td><td>38 000 ₽</td><td style="color:var(--green);font-weight:700">62 000 ₽</td><td style="color:var(--green2);font-weight:700">+24 000 ₽</td></tr>
+          <tr><td style="color:var(--text3)">06 мая</td><td style="color:var(--text);font-weight:600">Sony A9 III Body</td><td>Запад</td><td>118 000 ₽</td><td style="color:var(--green);font-weight:700">174 000 ₽</td><td style="color:var(--green2);font-weight:700">+56 000 ₽</td></tr>
+          <tr><td style="color:var(--text3)">04 мая</td><td style="color:var(--text);font-weight:600">Samsung Galaxy S25 Ultra</td><td>Север</td><td>74 000 ₽</td><td style="color:var(--green);font-weight:700">108 000 ₽</td><td style="color:var(--green2);font-weight:700">+34 000 ₽</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ======= PAGE 3: ANALYTICS ======= -->
+<div class="page" id="p3">
+  <div style="height:14px"></div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <div><div class="card-title">💎 ROI по категориям</div><div class="card-sub">Что выгодно брать в залог</div></div>
+      <span class="badge by">ТОП: Ювелирка 72%</span>
+    </div>
+    <div class="ch" style="height:260px"><canvas id="c_roi"></canvas></div>
+  </div>
+
+  <div class="stitle">Сравнение точек в деталях</div>
+  <div class="g3">
+    <div class="sc">
+      <div class="sc-name" style="color:var(--green)">🥇 Точка №1 — Центр</div>
+      <div class="sc-row"><span class="sc-lbl">Чист. прибыль</span><span class="sc-val" style="color:var(--green)">584 200 ₽</span></div>
+      <div class="bar-bg"><div class="bar-fill" style="width:100%;background:var(--green)"></div></div>
+      <div style="height:8px"></div>
+      <div class="sc-row"><span class="sc-lbl">Залогов</span><span class="sc-val">58 шт</span></div>
+      <div class="sc-row"><span class="sc-lbl">Продаж</span><span class="sc-val">29 шт</span></div>
+      <div class="sc-row"><span class="sc-lbl">% выкупа</span><span class="sc-val" style="color:var(--blue)">43%</span></div>
+      <div class="sc-row"><span class="sc-lbl">Ср. займ</span><span class="sc-val">182 000 ₽</span></div>
+      <div class="sc-row"><span class="sc-lbl">ROI порфеля</span><span class="sc-val" style="color:var(--green)">48%</span></div>
+      <div class="sc-row"><span class="sc-lbl">Кэш остаток</span><span class="sc-val" style="color:var(--yellow)">1 240 000 ₽</span></div>
+      <div class="sc-row"><span class="sc-lbl">Расходы/мес</span><span class="sc-val" style="color:var(--red)">248 000 ₽</span></div>
+    </div>
+    <div class="sc">
+      <div class="sc-name" style="color:var(--blue)">🥈 Точка №2 — Север</div>
+      <div class="sc-row"><span class="sc-lbl">Чист. прибыль</span><span class="sc-val" style="color:var(--blue)">456 100 ₽</span></div>
+      <div class="bar-bg"><div class="bar-fill" style="width:78%;background:var(--blue)"></div></div>
+      <div style="height:8px"></div>
+      <div class="sc-row"><span class="sc-lbl">Залогов</span><span class="sc-val">56 шт</span></div>
+      <div class="sc-row"><span class="sc-lbl">Продаж</span><span class="sc-val">27 шт</span></div>
+      <div class="sc-row"><span class="sc-lbl">% выкупа</span><span class="sc-val" style="color:var(--blue)">40%</span></div>
+      <div class="sc-row"><span class="sc-lbl">Ср. займ</span><span class="sc-val">174 000 ₽</span></div>
+      <div class="sc-row"><span class="sc-lbl">ROI портфеля</span><span class="sc-val" style="color:var(--blue)">44%</span></div>
+      <div class="sc-row"><span class="sc-lbl">Кэш остаток</span><span class="sc-val" style="color:var(--yellow)">910 000 ₽</span></div>
+      <div class="sc-row"><span class="sc-lbl">Расходы/мес</span><span class="sc-val" style="color:var(--red)">196 000 ₽</span></div>
+    </div>
+    <div class="sc">
+      <div class="sc-name" style="color:var(--purple)">🥉 Точка №3 — Запад</div>
+      <div class="sc-row"><span class="sc-lbl">Чист. прибыль</span><span class="sc-val" style="color:var(--purple)">323 900 ₽</span></div>
+      <div class="bar-bg"><div class="bar-fill" style="width:55%;background:var(--purple)"></div></div>
+      <div style="height:8px"></div>
+      <div class="sc-row"><span class="sc-lbl">Залогов</span><span class="sc-val">54 шт</span></div>
+      <div class="sc-row"><span class="sc-lbl">Продаж</span><span class="sc-val">25 шт</span></div>
+      <div class="sc-row"><span class="sc-lbl">% выкупа</span><span class="sc-val" style="color:var(--blue)">39%</span></div>
+      <div class="sc-row"><span class="sc-lbl">Ср. займ</span><span class="sc-val">168 000 ₽</span></div>
+      <div class="sc-row"><span class="sc-lbl">ROI портфеля</span><span class="sc-val" style="color:var(--purple)">38%</span></div>
+      <div class="sc-row"><span class="sc-lbl">Кэш остаток</span><span class="sc-val" style="color:var(--yellow)">660 000 ₽</span></div>
+      <div class="sc-row"><span class="sc-lbl">Расходы/мес</span><span class="sc-val" style="color:var(--red)">182 000 ₽</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="card-hdr">
+      <div><div class="card-title">🗓️ Сезонность 2026</div><div class="card-sub">Залоги vs Продажи vs Выкуп</div></div>
+      <span class="badge bo">Пики: Янв, Апр, Май</span>
+    </div>
+    <div class="ch" style="height:220px"><canvas id="c_heat"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><div><div class="card-title">📋 Категории — полная таблица</div><div class="card-sub">ROI · выкуп · прибыль · рейтинг</div></div></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Категория</th><th>Залогов</th><th>ROI</th><th>Выкуп%</th><th>Прибыль</th><th>★</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--text);font-weight:600">💍 Ювелирка</td><td>24</td><td style="color:var(--green);font-weight:700">72%</td><td>46%</td><td style="color:var(--green2);font-weight:700">486 000 ₽</td><td>⭐⭐⭐⭐⭐</td></tr>
+          <tr><td style="color:var(--text);font-weight:600">⌚ Часы</td><td>22</td><td style="color:var(--green);font-weight:700">58%</td><td>40%</td><td style="color:var(--green2);font-weight:700">374 000 ₽</td><td>⭐⭐⭐⭐⭐</td></tr>
+          <tr><td style="color:var(--text);font-weight:600">📱 Смартфоны</td><td>34</td><td style="color:var(--blue);font-weight:700">51%</td><td>44%</td><td style="color:var(--blue);font-weight:700">298 000 ₽</td><td>⭐⭐⭐⭐</td></tr>
+          <tr><td style="color:var(--text);font-weight:600">💻 Ноутбуки</td><td>28</td><td style="color:var(--blue);font-weight:700">44%</td><td>37%</td><td style="color:var(--blue);font-weight:700">241 000 ₽</td><td>⭐⭐⭐⭐</td></tr>
+          <tr><td style="color:var(--text);font-weight:600">📷 Фотоаппараты</td><td>18</td><td style="color:var(--purple);font-weight:700">41%</td><td>34%</td><td style="color:var(--purple);font-weight:700">138 000 ₽</td><td>⭐⭐⭐</td></tr>
+          <tr><td style="color:var(--text);font-weight:600">🎮 Консоли</td><td>16</td><td style="color:var(--purple);font-weight:700">39%</td><td>31%</td><td style="color:var(--purple);font-weight:700">96 000 ₽</td><td>⭐⭐⭐</td></tr>
+          <tr><td style="color:var(--text);font-weight:600">📺 Телевизоры</td><td>12</td><td style="color:var(--text2);font-weight:700">34%</td><td>29%</td><td style="color:var(--text2);font-weight:700">62 000 ₽</td><td>⭐⭐</td></tr>
+          <tr><td style="color:var(--text);font-weight:600">🔧 Инструмент</td><td>14</td><td style="color:var(--text3);font-weight:700">28%</td><td>42%</td><td style="color:var(--text3);font-weight:700">44 000 ₽</td><td>⭐⭐</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ======= PAGE 4: FORECAST ======= -->
+<div class="page" id="p4">
+  <div style="height:14px"></div>
+
+  <div class="stitle">🤖 ИИ-Инсайты на основе данных 2026</div>
+
+  <div class="ins">
+    <div class="ins-ico">📈</div>
+    <div><div class="ins-title">Прогноз выручки на 2026</div><div class="ins-text">При текущем темпе роста (+17%) годовая выручка составит <strong style="color:var(--green)">~10 124 000 ₽</strong>. Основной драйвер — рост среднего чека залога. Рекомендую увеличить лимиты по ювелирке и часам на 15%.</div></div>
+  </div>
+  <div class="ins">
+    <div class="ins-ico">⚠️</div>
+    <div><div class="ins-title">Риск кэш-потока в июле</div><div class="ins-text">Исторически в июле-августе спад 18-22%. При расходах <strong style="color:var(--yellow)">626 000 ₽/мес</strong> рекомендую сформировать резерв <strong style="color:var(--red)">~800 000 ₽</strong> к июню.</div></div>
+  </div>
+  <div class="ins">
+    <div class="ins-ico">💡</div>
+    <div><div class="ins-title">Точка №3 Запад — потенциал роста</div><div class="ins-text">Запад отстаёт от Центра на 45% по прибыли, но имеет самый высокий средний чек (168к ₽). Проблема: низкий % выкупа (39%). Решение: SMS за 7 дней до срока → +8-12% выкупа → <strong style="color:var(--green)">+120к ₽/год</strong>.</div></div>
+  </div>
+  <div class="ins">
+    <div class="ins-ico">🏆</div>
+    <div><div class="ins-title">Лучшая категория — Ювелирка</div><div class="ins-text">ROI 72% при выкупе 46%. Рекомендую увеличить долю ювелирки с 14% до 25% портфеля. Доп. прибыль: <strong style="color:var(--green)">+180 000 ₽/год</strong>.</div></div>
+  </div>
+
+  <div class="stitle" style="margin-top:8px">Прогноз на оставшиеся 7 месяцев 2026</div>
+  <div class="fc-grid">
+    <div class="fc-card"><div class="fc-lbl">Выручка</div><div class="fc-val" style="color:var(--green)">5 906к ₽</div><div class="fc-note">Июн–Дек 2026</div></div>
+    <div class="fc-card"><div class="fc-lbl">Прибыль</div><div class="fc-val" style="color:var(--blue)">1 890к ₽</div><div class="fc-note">прогноз</div></div>
+    <div class="fc-card"><div class="fc-lbl">Залогов</div><div class="fc-val" style="color:var(--purple)">~112 шт</div><div class="fc-note">прогноз</div></div>
+    <div class="fc-card"><div class="fc-lbl">Годовая</div><div class="fc-val" style="color:var(--yellow)">10.1М ₽</div><div class="fc-note">итого 2026</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <div><div class="card-title">🔮 Прогноз прибыли — полный 2026</div><div class="card-sub">Факт (янв-май) + прогноз (июн-дек)</div></div>
+      <span class="badge bp">ML-прогноз</span>
+    </div>
+    <div class="ch" style="height:250px"><canvas id="c_fore"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><div><div class="card-title">⚖️ Точка безубыточности</div><div class="card-sub">Сколько залогов нужно в месяц</div></div></div>
+    <div class="g2" style="gap:10px">
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;font-weight:600">Расходы/мес (3 точки)</div>
+        <div style="font-size:26px;font-weight:900;color:var(--red)">626к ₽</div>
+      </div>
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;font-weight:600">Нужно залогов мин.</div>
+        <div style="font-size:26px;font-weight:900;color:var(--green)">≥ 11 шт</div>
+      </div>
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;font-weight:600">Факт (май 2026)</div>
+        <div style="font-size:26px;font-weight:900;color:var(--blue)">18 шт</div>
+        <div style="font-size:10px;color:var(--green);margin-top:4px">✅ Запас +7 шт</div>
+      </div>
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;font-weight:600">Мин. выручка/мес</div>
+        <div style="font-size:26px;font-weight:900;color:var(--yellow)">1 858к ₽</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><div><div class="card-title">🎛️ Симулятор сценариев</div><div class="card-sub">Нажми на сценарий и смотри результат</div></div></div>
+    <div class="pills" id="simPills">
+      <span class="pill on" onclick="sim(this,'base')">📊 Базовый</span>
+      <span class="pill" onclick="sim(this,'up20')">🚀 +20% залогов</span>
+      <span class="pill" onclick="sim(this,'red')">🔄 +10% выкупа</span>
+      <span class="pill" onclick="sim(this,'mar')">💎 +5% маржа</span>
+    </div>
+    <div class="sim-grid">
+      <div><div class="sim-lbl">Годовая выручка</div><div class="sim-val" id="sRev" style="color:var(--green)">10 124 000 ₽</div></div>
+      <div><div class="sim-lbl">Годовая прибыль</div><div class="sim-val" id="sProfit" style="color:var(--blue)">3 254 200 ₽</div></div>
+      <div><div class="sim-lbl">Доп. прибыль</div><div class="sim-val" id="sExtra" style="color:var(--text2);font-size:14px">базовый сценарий</div></div>
+      <div><div class="sim-lbl">ROI портфеля</div><div class="sim-val" id="sRoi" style="color:var(--yellow)">43%</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <div class="bn on" id="bn0" onclick="goTab(0)"><div class="bn-ico">📊</div><div class="bn-lbl">Обзор</div></div>
+  <div class="bn" id="bn1" onclick="goTab(1)"><div class="bn-ico">🔑</div><div class="bn-lbl">Залоги</div></div>
+  <div class="bn" id="bn2" onclick="goTab(2)"><div class="bn-ico">💸</div><div class="bn-lbl">Продажи</div></div>
+  <div class="bn" id="bn3" onclick="goTab(3)"><div class="bn-ico">📈</div><div class="bn-lbl">Анализ</div></div>
+  <div class="bn" id="bn4" onclick="goTab(4)"><div class="bn-ico">🔮</div><div class="bn-lbl">Прогноз</div></div>
+</nav>
+
+<!-- MODAL -->
+<div class="overlay" id="ov" onclick="closeModal()">
+  <div class="mbox" onclick="event.stopPropagation()">
+    <div class="m-title" id="mT">—</div>
+    <div class="m-body" id="mB">—</div>
+    <button class="m-close" onclick="closeModal()">Закрыть ✕</button>
+  </div>
+</div>
+
+<script>
+// ---- CHART DEFAULTS ----
+Chart.defaults.color = '#7a9cc0';
+Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+Chart.defaults.font.size = 11;
+Chart.defaults.plugins.legend.labels.boxWidth = 10;
+Chart.defaults.plugins.legend.labels.boxHeight = 10;
+Chart.defaults.plugins.legend.labels.padding = 10;
+
+// ---- DATA ----
+const M5  = ['Янв','Фев','Мар','Апр','Май'];
+const M12 = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+
+// ---- TOOLTIP CONFIG ----
+function tt(extra){
+  return {
+    backgroundColor:'#0e1929',
+    borderColor:'#1a2d45',
+    borderWidth:1,
+    padding:12,
+    callbacks: extra || {}
+  };
+}
+
+// ---- CLOCK ----
+function tick(){
+  var n = new Date();
+  var d = n.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});
+  var t = n.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  var el = document.getElementById('clk');
+  if(el) el.textContent = d+' '+t;
+}
+tick();
+setInterval(tick, 30000);
+
+// ---- TABS ----
+var curTab = 0;
+var chartsInited = {};
+
+function goTab(i){
+  for(var j=0;j<5;j++){
+    var p = document.getElementById('p'+j);
+    var t = document.getElementById('t'+j);
+    var b = document.getElementById('bn'+j);
+    if(p) p.classList.toggle('on', j===i);
+    if(t) t.classList.toggle('on', j===i);
+    if(b) b.classList.toggle('on', j===i);
+  }
+  curTab = i;
+  window.scrollTo({top:0});
+  // init charts for this tab if not yet done
+  setTimeout(function(){ initChartsForTab(i); }, 50);
+}
+
+// ---- PILLS ----
+function pillSel(el, scope){
+  var parent = scope ? document.querySelector(scope) : el.parentElement;
+  if(!parent) parent = el.parentElement;
+  var pills = parent.querySelectorAll('.pill');
+  for(var i=0;i<pills.length;i++) pills[i].classList.remove('on');
+  el.classList.add('on');
+}
+
+// ---- MODAL ----
+var MODALS = {
+  portfolio:{
+    t:'💰 Залоговый портфель',
+    b:'Активных залогов: <strong style="color:#00e5b0">14 позиций</strong><br><br>Суммарно выдано: <strong style="color:#00e5b0">3 842 500 ₽</strong><br>Оценочная стоимость: <strong style="color:#ffd600">5 680 000 ₽</strong><br>Средний займ: <strong>274 500 ₽</strong><br><br>🏪 Центр: 1 240 000 ₽<br>🏪 Север: 1 480 500 ₽<br>🏪 Запад: 1 122 000 ₽'
+  },
+  revenue:{
+    t:'📈 Выручка 2026 (5 мес)',
+    b:'Всего получено: <strong style="color:#3d8eff">4 218 600 ₽</strong><br><br>▸ От продаж товара: 3 148 000 ₽<br>▸ Проценты по займам: 1 070 600 ₽<br><br>Выполнение плана: <strong style="color:#00e5b0">105%</strong> ✅<br>Лучший месяц: Май 2026<br>Лучшая точка: Центр'
+  },
+  profit:{
+    t:'💎 Чистая прибыль',
+    b:'Прибыль 5 мес 2026: <strong style="color:#9d78ff">1 364 200 ₽</strong><br><br>По точкам:<br>🥇 Центр: 584 200 ₽<br>🥈 Север: 456 100 ₽<br>🥉 Запад: 323 900 ₽<br><br>Рентабельность: <strong style="color:#9d78ff">32%</strong><br>Расходов: 2 854 400 ₽'
+  },
+  stock:{
+    t:'📦 Товарный склад',
+    b:'Позиций: <strong style="color:#ffd600">18 шт</strong><br>Оценка: <strong style="color:#ffd600">5 680 000 ₽</strong><br>Себестоимость: 3 840 000 ₽<br><br>Висят >30 дней: <strong style="color:#ff7c3d">3 шт</strong><br>Висят >60 дней: <strong style="color:#ff3d5a">1 шт</strong><br><br>⚡ Рекомендация: снизить цену на "висяки" на 10%'
+  },
+  alerts:{
+    t:'🔥 Горящие залоги',
+    b:'Просрочено: <strong style="color:#ff3d5a">2 позиции</strong><br>Истекает сегодня-завтра: <strong style="color:#ffd600">1</strong><br>До 7 дней: <strong style="color:#ff7c3d">2 позиции</strong><br><br>Сумма под риском: <strong style="color:#ff3d5a">1 544 000 ₽</strong><br><br>⚡ Позвони клиентам СЕГОДНЯ!'
+  },
+  action:{
+    t:'⚡ Выставить на продажу',
+    b:'Товар просрочен. Рекомендуемые действия:<br><br>1️⃣ Попробовать дозвониться клиенту<br>2️⃣ Отправить SMS с предложением выкупить<br>3️⃣ Оценить рыночную цену (Авито, DNS)<br>4️⃣ Выставить по рыночной цене −10%<br><br>Ожидаемая прибыль при продаже: <strong style="color:#00e5b0">+35-45%</strong> к сумме займа'
+  },
+  call:{
+    t:'📞 Напомнить клиенту',
+    b:'Рекомендуемый скрипт звонка:<br><br><em style="color:#7a9cc0">"Добрый день! Напоминаем: срок выкупа вашего залога истекает [ДАТА]. Вы можете выкупить товар или продлить срок. Ждём вас!"</em><br><br>💡 Совет: SMS за 7 дней до срока увеличивает выкуп на +8-12%'
+  }
+};
+
+function showModal(key){
+  var m = MODALS[key];
+  if(!m) return;
+  document.getElementById('mT').textContent = m.t;
+  document.getElementById('mB').innerHTML = m.b;
+  document.getElementById('ov').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(){
+  document.getElementById('ov').classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+// ---- SIMULATOR ----
+var SIM_DATA = {
+  base: {rev:'10 124 000 ₽', profit:'3 254 200 ₽', extra:'— базовый сценарий', roi:'43%', col:'#7a9cc0'},
+  up20: {rev:'12 148 800 ₽', profit:'4 104 200 ₽', extra:'+850 000 ₽ доп. прибыли!', roi:'51%', col:'#00ff88'},
+  red:  {rev:'11 240 000 ₽', profit:'3 748 200 ₽', extra:'+494 000 ₽ доп. прибыли!', roi:'47%', col:'#00e5b0'},
+  mar:  {rev:'10 124 000 ₽', profit:'3 760 200 ₽', extra:'+506 000 ₽ доп. прибыли!', roi:'49%', col:'#3d8eff'}
+};
+
+function sim(el, mode){
+  pillSel(el, '#simPills');
+  var s = SIM_DATA[mode];
+  document.getElementById('sRev').textContent    = s.rev;
+  document.getElementById('sProfit').textContent = s.profit;
+  document.getElementById('sExtra').textContent  = s.extra;
+  document.getElementById('sExtra').style.color  = s.col;
+  document.getElementById('sRoi').textContent    = s.roi;
+}
+
+// ---- CHARTS ----
+var CHARTS = {};
+
+function mkGrad(ctx, h, c1, c2){
+  var g = ctx.createLinearGradient(0, 0, 0, h);
+  g.addColorStop(0, c1);
+  g.addColorStop(1, c2);
+  return g;
+}
+
+function safeCanvas(id){
+  var el = document.getElementById(id);
+  if(!el) return null;
+  // destroy if already exists
+  if(CHARTS[id]){
+    CHARTS[id].destroy();
+    delete CHARTS[id];
+  }
+  return el;
+}
+
+function initChartsForTab(tabIdx){
+  if(tabIdx === 0) initTab0();
+  if(tabIdx === 1) initTab1();
+  if(tabIdx === 2) initTab2();
+  if(tabIdx === 3) initTab3();
+  if(tabIdx === 4) initTab4();
+}
+
+// -- TAB 0 --
+function initTab0(){
+  // PNL
+  var el = safeCanvas('c_pnl');
+  if(el){
+    var ctx = el.getContext('2d');
+    var h = 240;
+    var g = mkGrad(ctx, h, 'rgba(0,229,176,0.22)', 'rgba(0,229,176,0)');
+    var inc = [682000,724000,798000,856000,942000];
+    var exp = [514000,514000,530000,544000,552000];
+    var prf = inc.map(function(v,i){return v-exp[i];});
+    CHARTS['c_pnl'] = new Chart(ctx, {
+      type:'bar',
+      data:{
+        labels:M5,
+        datasets:[
+          {label:'Доходы', data:inc, backgroundColor:'rgba(61,142,255,0.5)', borderColor:'#3d8eff', borderWidth:1, borderRadius:5, borderSkipped:false, order:2},
+          {label:'Расходы', data:exp, backgroundColor:'rgba(255,61,90,0.4)', borderColor:'#ff3d5a', borderWidth:1, borderRadius:5, borderSkipped:false, order:2},
+          {label:'Прибыль', data:prf, type:'line', borderColor:'#00e5b0', backgroundColor:g, borderWidth:2.5, pointRadius:5, pointBackgroundColor:'#00e5b0', pointBorderColor:'#060d1a', pointBorderWidth:2, tension:0.4, fill:true, order:1}
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{legend:{position:'top',align:'end'}, tooltip:tt({label:function(c){return ' '+c.dataset.label+': '+(c.parsed.y/1000).toFixed(0)+'к ₽';}})},
+        scales:{
+          x:{grid:{color:'rgba(26,45,69,0.5)'},ticks:{color:'#344d6b'}},
+          y:{grid:{color:'rgba(26,45,69,0.5)'},ticks:{color:'#344d6b',callback:function(v){return (v/1000).toFixed(0)+'к';}}}
+        }
+      }
+    });
+  }
+
+  // DONUT
+  el = safeCanvas('c_donut');
+  if(el){
+    CHARTS['c_donut'] = new Chart(el.getContext('2d'), {
+      type:'doughnut',
+      data:{
+        labels:['Выкуплено','Продано','Активные'],
+        datasets:[{data:[69,81,18], backgroundColor:['#00e5b0','#3d8eff','#9d78ff'], borderColor:'#0e1929', borderWidth:3, hoverOffset:8}]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false, cutout:'68%',
+        plugins:{legend:{display:false}, tooltip:tt({label:function(c){return ' '+c.label+': '+c.parsed+' шт';}})}
+      }
+    });
+  }
+
+  // DYNAMICS
+  el = safeCanvas('c_dyn');
+  if(el){
+    var ctx2 = el.getContext('2d');
+    var h2 = 220;
+    CHARTS['c_dyn'] = new Chart(ctx2, {
+      type:'line',
+      data:{
+        labels:M5,
+        datasets:[
+          {label:'Залогов', data:[34,28,36,32,38], borderColor:'#00e5b0', backgroundColor:mkGrad(ctx2,h2,'rgba(0,229,176,0.2)','rgba(0,229,176,0)'), borderWidth:2.5, pointRadius:5, pointBackgroundColor:'#00e5b0', pointBorderColor:'#060d1a', pointBorderWidth:2, tension:0.4, fill:true},
+          {label:'Продаж',  data:[14,12,16,16,18], borderColor:'#3d8eff', backgroundColor:mkGrad(ctx2,h2,'rgba(61,142,255,0.18)','rgba(61,142,255,0)'), borderWidth:2.5, pointRadius:5, pointBackgroundColor:'#3d8eff', pointBorderColor:'#060d1a', pointBorderWidth:2, tension:0.4, fill:true},
+          {label:'Выкупов', data:[14,12,14,13,16], borderColor:'#9d78ff', backgroundColor:mkGrad(ctx2,h2,'rgba(157,120,255,0.18)','rgba(157,120,255,0)'), borderWidth:2.5, pointRadius:5, pointBackgroundColor:'#9d78ff', pointBorderColor:'#060d1a', pointBorderWidth:2, tension:0.4, fill:true}
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{legend:{position:'top',align:'end'}, tooltip:tt({label:function(c){return ' '+c.dataset.label+': '+c.parsed.y+' шт';}})},
+        scales:{
+          x:{grid:{color:'rgba(26,45,69,0.5)'},ticks:{color:'#344d6b'}},
+          y:{grid:{color:'rgba(26,45,69,0.5)'},ticks:{color:'#344d6b',stepSize:4},min:0}
+        }
+      }
+    });
+  }
+}
+
+// -- TAB 1 --
+function initTab1(){
+  var el = safeCanvas('c_pmon');
+  if(el){
+    CHARTS['c_pmon'] = new Chart(el.getContext('2d'), {
+      type:'bar',
+      data:{
+        labels:M5,
+        datasets:[
+          {label:'Залогов принято', data:[34,28,36,32,38], backgroundColor:'rgba(0,229,176,0.5)', borderColor:'#00e5b0', borderWidth:1, borderRadius:5, yAxisID:'y'},
+          {label:'Объём тыс ₽',    data:[5848,4760,6084,5408,6384], backgroundColor:'rgba(61,142,255,0.3)', borderColor:'#3d8eff', borderWidth:1, borderRadius:5, yAxisID:'y1'}
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{legend:{position:'top',align:'end'}, tooltip:{backgroundColor:'#0e1929',borderColor:'#1a2d45',borderWidth:1,padding:10}},
+        scales:{
+          x:{grid:{color:'rgba(26,45,69,0.4)'},ticks:{color:'#344d6b'}},
+          y:{grid:{color:'rgba(26,45,69,0.4)'},ticks:{color:'#344d6b'},position:'left'},
+          y1:{grid:{display:false},ticks:{color:'#3d8eff',callback:function(v){return v+'к';}},position:'right'}
+        }
+      }
+    });
+  }
+
+  el = safeCanvas('c_pcat');
+  if(el){
+    CHARTS['c_pcat'] = new Chart(el.getContext('2d'), {
+      type:'bar',
+      data:{
+        labels:['Смартфоны','Ноутбуки','Ювелирка','Часы','Фото','Консоли','ТВ','Инструмент'],
+        datasets:[{
+          label:'Залогов',
+          data:[34,28,24,22,18,16,12,14],
+          backgroundColor:['#3d8eff','#3d8eff','#ffd600','#9d78ff','#ff7c3d','#00e5b0','#344d6b','#344d6b'],
+          borderRadius:5, borderSkipped:false
+        }]
+      },
+      options:{
+        indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}, tooltip:{backgroundColor:'#0e1929',borderColor:'#1a2d45',borderWidth:1,callbacks:{label:function(c){return ' '+c.parsed.x+' залогов';}}}},
+        scales:{
+          x:{grid:{color:'rgba(26,45,69,0.5)'},ticks:{color:'#344d6b'}},
+          y:{grid:{display:false},ticks:{color:'#7a9cc0'}}
+        }
+      }
+    });
+  }
+}
+
+// -- TAB 2 --
+function initTab2(){
+  var el = safeCanvas('c_sales');
+  if(el){
+    var ctx = el.getContext('2d');
+    var rev = [1420000,1540000,1780000,1980000,2220000];
+    var pro = [426000,462000,534000,594000,666000];
+    CHARTS['c_sales'] = new Chart(ctx, {
+      type:'bar',
+      data:{
+        labels:M5,
+        datasets:[
+          {label:'Выручка', data:rev, backgroundColor:'rgba(61,142,255,0.5)', borderColor:'#3d8eff', borderWidth:1, borderRadius:5, order:2},
+          {label:'Прибыль', data:pro, type:'line', borderColor:'#00e5b0', backgroundColor:mkGrad(ctx,230,'rgba(0,229,176,0.2)','rgba(0,229,176,0)'), borderWidth:2.5, pointRadius:5, pointBackgroundColor:'#00e5b0', pointBorderColor:'#060d1a', pointBorderWidth:2, tension:0.4, fill:true, order:1}
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{legend:{position:'top',align:'end'}, tooltip:tt({label:function(c){return ' '+c.dataset.label+': '+(c.parsed.y/1000).toFixed(0)+'к ₽';}})},
+        scales:{
+          x:{grid:{color:'rgba(26,45,69,0.4)'},ticks:{color:'#344d6b'}},
+          y:{grid:{color:'rgba(26,45,69,0.4)'},ticks:{color:'#344d6b',callback:function(v){return (v/1000).toFixed(0)+'к';}}}
+        }
+      }
+    });
+  }
+
+  el = safeCanvas('c_catsal');
+  if(el){
+    CHARTS['c_catsal'] = new Chart(el.getContext('2d'), {
+      type:'doughnut',
+      data:{
+        labels:['Смартфоны','Часы','Ноутбуки','Ювелирка','Фото','Остальные'],
+        datasets:[{data:[2240,1980,1680,1560,980,500], backgroundColor:['#3d8eff','#9d78ff','#00e5b0','#ffd600','#ff7c3d','#344d6b'], borderColor:'#0e1929', borderWidth:3, hoverOffset:8}]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false, cutout:'55%',
+        plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}, tooltip:{backgroundColor:'#0e1929',borderColor:'#1a2d45',borderWidth:1,callbacks:{label:function(c){return ' '+c.label+': '+c.parsed+'к ₽';}}}}
+      }
+    });
+  }
+
+  el = safeCanvas('c_speed');
+  if(el){
+    // Fixed: не используем функцию в backgroundColor
+    CHARTS['c_speed'] = new Chart(el.getContext('2d'), {
+      type:'bar',
+      data:{
+        labels:['Ювелирка','Смартфоны','Часы','Аудио','Ноутбуки','Консоли','Фото','Инструмент','ТВ'],
+        datasets:[{
+          label:'Дней до продажи',
+          data:[8,11,14,16,18,22,24,28,34],
+          backgroundColor:['rgba(0,229,176,0.65)','rgba(0,229,176,0.65)','rgba(0,229,176,0.65)','rgba(255,214,0,0.6)','rgba(255,214,0,0.6)','rgba(255,214,0,0.6)','rgba(255,61,90,0.5)','rgba(255,61,90,0.5)','rgba(255,61,90,0.5)'],
+          borderRadius:5, borderSkipped:false
+        }]
+      },
+      options:{
+        indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}, tooltip:{backgroundColor:'#0e1929',borderColor:'#1a2d45',borderWidth:1,callbacks:{label:function(c){return ' '+c.parsed.x+' дней';}}}},
+        scales:{
+          x:{grid:{color:'rgba(26,45,69,0.4)'},ticks:{color:'#344d6b'}},
+          y:{grid:{display:false},ticks:{color:'#7a9cc0',font:{size:10}}}
+        }
+      }
+    });
+  }
+}
+
+// -- TAB 3 --
+function initTab3(){
+  var el = safeCanvas('c_roi');
+  if(el){
+    var vals = [72,58,51,44,41,39,34,28];
+    CHARTS['c_roi'] = new Chart(el.getContext('2d'), {
+      type:'bar',
+      data:{
+        labels:['Ювелирка','Часы','Смартфоны','Ноутбуки','Фото','Консоли','Телевизоры','Инструмент'],
+        datasets:[{
+          data:vals,
+          backgroundColor:['rgba(255,214,0,0.7)','rgba(255,214,0,0.7)','rgba(0,229,176,0.65)','rgba(0,229,176,0.65)','rgba(61,142,255,0.65)','rgba(61,142,255,0.65)','rgba(52,77,107,0.7)','rgba(52,77,107,0.7)'],
+          borderRadius:6, borderSkipped:false
+        }]
+      },
+      options:{
+        indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}, tooltip:{backgroundColor:'#0e1929',borderColor:'#1a2d45',borderWidth:1,callbacks:{label:function(c){return ' ROI: '+c.parsed.x+'%';}}}},
+        scales:{
+          x:{grid:{color:'rgba(26,45,69,0.4)'},ticks:{color:'#344d6b',callback:function(v){return v+'%';}},max:85},
+          y:{grid:{display:false},ticks:{color:'#7a9cc0'}}
+        }
+      }
+    });
+  }
+
+  el = safeCanvas('c_heat');
+  if(el){
+    var ctx = el.getContext('2d');
+    var h = 220;
+    CHARTS['c_heat'] = new Chart(ctx, {
+      type:'line',
+      data:{
+        labels:M5,
+        datasets:[
+          {label:'Залогов', data:[34,28,36,32,38], borderColor:'#00e5b0', backgroundColor:mkGrad(ctx,h,'rgba(0,229,176,0.2)','rgba(0,229,176,0)'), borderWidth:2.5, pointRadius:5, pointBackgroundColor:'#00e5b0', pointBorderColor:'#060d1a', pointBorderWidth:2, tension:0.4, fill:true},
+          {label:'Продаж',  data:[14,12,16,16,18], borderColor:'#3d8eff', backgroundColor:mkGrad(ctx,h,'rgba(61,142,255,0.18)','rgba(61,142,255,0)'), borderWidth:2.5, pointRadius:5, pointBackgroundColor:'#3d8eff', pointBorderColor:'#060d1a', pointBorderWidth:2, tension:0.4, fill:true},
+          {label:'Выкупов', data:[14,12,14,13,16], borderColor:'#9d78ff', backgroundColor:mkGrad(ctx,h,'rgba(157,120,255,0.18)','rgba(157,120,255,0)'), borderWidth:2.5, pointRadius:5, pointBackgroundColor:'#9d78ff', pointBorderColor:'#060d1a', pointBorderWidth:2, tension:0.4, fill:true}
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{legend:{position:'top',align:'end'}, tooltip:{backgroundColor:'#0e1929',borderColor:'#1a2d45',borderWidth:1,padding:10,callbacks:{label:function(c){return ' '+c.dataset.label+': '+c.parsed.y+' шт';}}}},
+        scales:{
+          x:{grid:{color:'rgba(26,45,69,0.4)'},ticks:{color:'#344d6b'}},
+          y:{grid:{color:'rgba(26,45,69,0.4)'},ticks:{color:'#344d6b',stepSize:4},min:0}
+        }
+      }
+    });
+  }
+}
+
+// -- TAB 4 --
+function initTab4(){
+  var el = safeCanvas('c_fore');
+  if(el){
+    var ctx = el.getContext('2d');
+    var h = 250;
+    var fact     = [168000,190000,268000,312000,390000,null,null,null,null,null,null,null];
+    var forecast = [null,null,null,null,390000,420000,380000,410000,460000,490000,440000,530000];
+    CHARTS['c_fore'] = new Chart(ctx, {
+      type:'line',
+      data:{
+        labels:M12,
+        datasets:[
+          {label:'Факт прибыль',    data:fact,     borderColor:'#00e5b0', backgroundColor:mkGrad(ctx,h,'rgba(0,229,176,0.22)','rgba(0,229,176,0)'), borderWidth:3, pointRadius:5, pointBackgroundColor:'#00e5b0', pointBorderColor:'#060d1a', pointBorderWidth:2, tension:0.4, fill:true, spanGaps:false},
+          {label:'Прогноз прибыль', data:forecast, borderColor:'#9d78ff', backgroundColor:mkGrad(ctx,h,'rgba(157,120,255,0.15)','rgba(157,120,255,0)'), borderWidth:2.5, borderDash:[6,3], pointRadius:4, pointBackgroundColor:'#9d78ff', pointBorderColor:'#060d1a', pointBorderWidth:2, tension:0.4, fill:true, spanGaps:false}
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{legend:{position:'top',align:'end'}, tooltip:{backgroundColor:'#0e1929',borderColor:'#1a2d45',borderWidth:1,padding:12,callbacks:{label:function(c){if(c.parsed.y==null) return '';return ' '+c.dataset.label+': '+(c.parsed.y/1000).toFixed(0)+'к ₽';}}}},
+        scales:{
+          x:{grid:{color:'rgba(26,45,69,0.4)'},ticks:{color:'#344d6b'}},
+          y:{grid:{color:'rgba(26,45,69,0.4)'},ticks:{color:'#344d6b',callback:function(v){return (v/1000).toFixed(0)+'к';}},min:0}
+        }
+      }
+    });
+  }
+}
+
+// ---- INIT ON LOAD ----
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(function(){
+    initTab0();
+  }, 100);
+});
+
+// fallback
+window.addEventListener('load', function(){
+  if(!CHARTS['c_pnl']){
+    initTab0();
+  }
+});
+</script>
+</body>
+</html>
